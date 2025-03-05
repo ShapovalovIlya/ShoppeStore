@@ -55,21 +55,45 @@ public struct Product: Decodable, Hashable, Identifiable {
         self.image = image
         self.rating = rating
     }
+    
+    enum CodingKeys: CodingKey {
+        case id
+        case title
+        case price
+        case description
+        case category
+        case image
+        case rating
+    }
+    
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try container.decode(Int.self, forKey: .id)
+        self.title = try container.decode(String.self, forKey: .title)
+        self.price = try container.decode(Double.self, forKey: .price)
+        self.description = try container.decode(String.self, forKey: .description)
+        let categoryString = try container.decode(String.self, forKey: .category)
+        guard let category = Category(rawValue: categoryString) else {
+            throw DecodingError.typeMismatch(
+                Category.self,
+                DecodingError.Context(
+                    codingPath: [CodingKeys.category],
+                    debugDescription: "Invalid value"
+                )
+            )
+        }
+        self.category = category
+        self.image = try container.decode(URL.self, forKey: .image)
+        self.rating = try container.decode(Product.Rating.self, forKey: .rating)
+    }
 }
 
 public extension Product {
-    enum Category: CaseIterable, Decodable {
+    enum Category: String, CaseIterable, Decodable {
         case electronics
         case jewelery
-        case mensClothing
-        case womensClothing
-        
-        enum CodingKeys: String, CodingKey {
-            case electronics = "electronics"
-            case jewelery = "jewelery"
-            case mensClothing = "men's clothing"
-            case womensClothing = "women's clothing"
-        }
+        case mensClothing = "men's clothing"
+        case womensClothing = "women's clothing"
     }
     
     struct Rating: Decodable, Hashable {

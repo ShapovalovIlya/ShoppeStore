@@ -32,10 +32,10 @@ public extension ShoppeStore {
             .decodeJSON([Product].self, decoder: decoder)
     }
     
-    func fetchAllCategories() async -> Result<[String], Error> {
+    func fetchAllCategories() async -> Result<[Product.Category], Error> {
         await dataSession
             .resultFrom(.get, endpoint: .categories)
-            .decodeJSON([String].self, decoder: decoder)
+            .decodeJSON([Product.Category].self, decoder: decoder)
     }
     
     func fetchProduct(withId id: Int) async -> Result<Product, Error> {

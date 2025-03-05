@@ -37,6 +37,24 @@ public struct Product: Decodable, Hashable, Identifiable {
     public let category: Category
     public let image: URL
     public let rating: Rating
+    
+    public init(
+        id: Int,
+        title: String,
+        price: Double,
+        description: String,
+        category: Category,
+        image: URL,
+        rating: Rating
+    ) {
+        self.id = id
+        self.title = title
+        self.price = price
+        self.description = description
+        self.category = category
+        self.image = image
+        self.rating = rating
+    }
 }
 
 public extension Product {
@@ -57,5 +75,10 @@ public extension Product {
     struct Rating: Decodable, Hashable {
         public let rate: Double
         public let count: Int
+        
+        public init(rate: Double, count: Int) {
+            self.rate = rate
+            self.count = count
+        }
     }
 }

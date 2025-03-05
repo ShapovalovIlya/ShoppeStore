@@ -22,18 +22,39 @@ import Foundation
    },
  */
 
-public struct Product: Decodable {
+/*
+ "electronics",
+   "jewelery",
+   "men's clothing",
+   "women's clothing"
+ */
+
+public struct Product: Decodable, Hashable, Identifiable {
     public let id: Int
     public let title: String
     public let price: Double
     public let description: String
-    public let category: String
+    public let category: Category
     public let image: URL
     public let rating: Rating
 }
 
 public extension Product {
-    struct Rating: Decodable {
+    enum Category: CaseIterable, Decodable {
+        case electronics
+        case jewelery
+        case mensClothing
+        case womensClothing
+        
+        enum CodingKeys: String, CodingKey {
+            case electronics = "electronics"
+            case jewelery = "jewelery"
+            case mensClothing = "men's clothing"
+            case womensClothing = "women's clothing"
+        }
+    }
+    
+    struct Rating: Decodable, Hashable {
         public let rate: Double
         public let count: Int
     }

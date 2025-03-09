@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftFP
 
 public final class Persistence: Sendable {
     private let userDefaults = UserDefaults.standard
@@ -13,6 +14,8 @@ public final class Persistence: Sendable {
 
 public extension Persistence {
     //MARK: - Key
+    
+    /// Ключи, по которым осуществляется поиск данных в `UserDefaults`
     enum Key: String {
         case isOnboarded
         case favorites
@@ -21,11 +24,16 @@ public extension Persistence {
     }
     
     //MARK: - Properties
+    
+    /// Прошел-ли пользователь онбординг.
     var isOnboarded: Bool {
         get { userDefaults.boolForKey(.isOnboarded) }
         set { userDefaults.setValue(newValue, forKey: .isOnboarded) }
     }
     
+    /// `id` продуктов, добавленных в избранное.
+    ///
+    /// - important: Установка данного свойства с использованием пустой коллекцией, равносильна установке `nil`.
     var favorites: Set<Int>? {
         get {
             userDefaults
@@ -33,9 +41,19 @@ public extension Persistence {
                 .flatMap { $0 as? [Int] }
                 .map { $0.uniqued() }
         }
-        set { userDefaults.setValue(newValue.map(Array.init), forKey: .favorites) }
+        set {
+            userDefaults.setValue(
+                newValue.filter(!\.isEmpty).map(Array.init),
+                forKey: .favorites
+            )
+        }
     }
     
+    /// Список товаров в корзине пользователя.
+    ///
+    /// Ключем является  `id` товара, тогда как значение отражает кол-во данного товара в корзине.
+    ///
+    /// - important: Установка данного свойства с использованием пустой коллекцией, равносильна установке `nil`.
     var card: [Int : Int]? {
         get {
             userDefaults
@@ -51,13 +69,19 @@ public extension Persistence {
             let udObj = newValue?.reduce(into: [String: Int](), { partialResult, pair in
                 partialResult[pair.key.description] = pair.value
             })
-            userDefaults.setValue(udObj, forKey: .card)
+            userDefaults.setValue(
+                udObj.filter(!\.isEmpty),
+                forKey: .card
+            )
         }
     }
     
+    /// История поиска.
+    ///
+    /// - important: Установка данного свойства с использованием пустой коллекцией, равносильна установке `nil`.
     var searchHistory: [String]? {
         get { userDefaults.stringArrayForKey(.searchHistory) }
-        set { userDefaults.setValue(newValue, forKey: .searchHistory) }
+        set { userDefaults.setValue(newValue.filter(!\.isEmpty), forKey: .searchHistory) }
     }
 }
 

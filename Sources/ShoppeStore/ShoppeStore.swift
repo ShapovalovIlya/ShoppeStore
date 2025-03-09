@@ -7,12 +7,15 @@ import FoundationFX
 public final class ShoppeStore: Sendable {
     public static let shared = ShoppeStore()
     
+    public let persistence: Persistence
+    
     let dataSession: URLSession
     let imageSession: URLSession
     let decoder: JSONDecoder
     
     //MARK: - init(_:)
     init() {
+        self.persistence = Persistence()
         self.imageSession = URLSession(configuration: .imageSession)
         self.dataSession = URLSession(configuration: .dataSession)
         self.decoder = JSONDecoder()

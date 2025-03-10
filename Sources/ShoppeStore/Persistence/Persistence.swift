@@ -21,6 +21,7 @@ public extension Persistence {
         case favorites
         case card
         case searchHistory
+        case userToken
     }
     
     //MARK: - Properties
@@ -82,6 +83,14 @@ public extension Persistence {
     var searchHistory: [String]? {
         get { userDefaults.stringArrayForKey(.searchHistory) }
         set { userDefaults.setValue(newValue.filter(!\.isEmpty), forKey: .searchHistory) }
+    }
+    
+    /// Токен авторизации текущего пользователя.
+    ///
+    /// - important: Установка данного свойства с использованием пустой строки, равносильна установке `nil`.
+    var userToken: String? {
+        get { userDefaults.string(forKey: Persistence.Key.userToken.rawValue) }
+        set { userDefaults.setValue(newValue.filter(!\.isEmpty), forKey: .userToken) }
     }
 }
 

@@ -63,4 +63,8 @@ extension Endpoint {
             .withPath("category")
             .withPath(category)
     }
+    
+    static let auth = Endpoint.fakestoreapi
+        .withPath("auth")
+        .withPath("login")
 }

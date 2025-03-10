@@ -43,7 +43,8 @@ public extension ShoppeStore {
     /// - Returns: Результат запроса в виде коллекции товаров или ошибка, возникшая в процессе
     func fetchAllProducts() async -> Result<[Product], Error> {
         await dataSession
-            .resultFrom(.get, endpoint: .products)
+            .request(.products)
+            .apply(.get)
             .decodeJSON([Product].self, decoder: decoder)
     }
     
@@ -51,7 +52,8 @@ public extension ShoppeStore {
     /// - Returns: Результат запроса в виде коллекции категорий или ошибка, возникшая в процессе
     func fetchAllCategories() async -> Result<[Product.Category], Error> {
         await dataSession
-            .resultFrom(.get, endpoint: .categories)
+            .request(.categories)
+            .apply(.get)
             .decodeJSON([Product.Category].self, decoder: decoder)
     }
     
@@ -60,7 +62,8 @@ public extension ShoppeStore {
     /// - Returns: Результат запроса в виде товара или ошибка, возникшая в процессе
     func fetchProduct(withId id: Int) async -> Result<Product, Error> {
         await dataSession
-            .resultFrom(.get, endpoint: .product(withId: id))
+            .request(.product(withId: id))
+            .apply(.get)
             .decodeJSON(Product.self, decoder: decoder)
     }
     
@@ -69,7 +72,8 @@ public extension ShoppeStore {
     /// - Returns: Результат запроса в виде коллекции товаров или ошибка, возникшая в процессе
     func fetchProducts(category: Product.Category) async -> Result<[Product], Error> {
         await dataSession
-            .resultFrom(.get, endpoint: .product(in: category.rawValue))
+            .request(.product(in: category.rawValue))
+            .apply(.get)
             .decodeJSON([Product].self, decoder: decoder)
     }
     
@@ -78,7 +82,23 @@ public extension ShoppeStore {
     /// - Returns: Результат запроса в виде идентификатора удаленного товара или ошибка, возникшая в процесса
     func deleteProduct(withId id: Int) async -> Result<Int, Error> {
         await dataSession
-            .resultFrom(.delete, endpoint: .product(withId: id))
+            .request(.product(withId: id))
+            .apply(.delete)
             .map { _ in id }
+    }
+    
+    /// Авторизация пользователя.
+    /// - Parameter credentials: параметры для авторизации.
+    /// - Returns: Результат запроса в виде токена или ошибка, возникшая в процессе.
+    func auth(with credentials: Credentials) async -> Result<String, Error> {
+        await Result<Credentials, Error>
+            .success(credentials)
+            .encodeJSON(JSONEncoder())
+            .asyncFlatMap { body in
+                await dataSession
+                    .request(.auth)
+                    .apply(.post(body))
+                    .decodeJSON(String.self, decoder: decoder)
+            }
     }
 }

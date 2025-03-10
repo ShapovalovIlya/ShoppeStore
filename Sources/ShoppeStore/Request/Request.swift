@@ -19,5 +19,23 @@ extension Request {
         reduce { $0.httpMethod = m.rawValue.uppercased() }
     }
     
-    static let new = Request { URLRequest(url: $0) }
+    @inlinable func withBody(_ b: Data) -> Self {
+        reduce { $0.httpBody = b }
+    }
+    
+    @inlinable func withHeader(_ key: String, value: String) -> Self {
+        reduce { $0.addValue(value, forHTTPHeaderField: key) }
+    }
+    
+    @usableFromInline static let new = Request { URLRequest(url: $0) }
+    @usableFromInline static let get = Request.new.method(.get)
+    @usableFromInline static let delete = Request.new.method(.delete)
+    
+    @inlinable
+    static func post(_ b: Data) -> Self {
+        Request.new
+            .method(.post)
+            .withHeader("Content-Type", value: "application/json'")
+            .withBody(b)
+    }
 }

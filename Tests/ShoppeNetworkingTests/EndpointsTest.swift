@@ -30,4 +30,9 @@ struct EndpointsTest {
         let sut = try Endpoint.product(in: "baz").url().get()
         #expect(sut.absoluteString == "Https://fakestoreapi.com/products/category/baz")
     }
+    
+    @Test func auth() async throws {
+        let sut = try Endpoint.auth.url().get()
+        #expect(sut.absoluteString == "Https://fakestoreapi.com/auth/login")
+    }
 }

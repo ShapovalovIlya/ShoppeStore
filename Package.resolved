@@ -1,5 +1,4 @@
 {
-  "originHash" : "6496fc3f251e20d734709eba046497ac1cd5ef96039a9c96d2858305488eedd3",
   "pins" : [
     {
       "identity" : "swiftfp",
@@ -7,9 +6,9 @@
       "location" : "https://github.com/ShapovalovIlya/SwiftFP.git",
       "state" : {
         "branch" : "main",
-        "revision" : "f1062eb20d5bca63655df96d22d2dfc725b5dd66"
+        "revision" : "87580f71dcc2a4f76a11ee2ebda3719c54367dc2"
       }
     }
   ],
-  "version" : 3
+  "version" : 2
 }

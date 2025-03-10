@@ -7,32 +7,45 @@
 
 import Foundation
 import FoundationFX
+import Readers
 
-extension URLSession {
-    func parseResponse(data: Data, response: URLResponse) -> Result<Data, Error> {
-        Result {
+extension Result where Success == (data: Data, response: URLResponse) {
+    @inlinable
+    func validateStatus(_ validCodes: ClosedRange<Int>) -> Result<Data, Error> {
+        tryMap { data, response in
             guard let httpResp = response as? HTTPURLResponse else {
-                throw URLError(.badServerResponse, userInfo: ["invalidType": response])
+                throw URLError(.badServerResponse, userInfo: ["response": response])
             }
-            guard (200...299).contains(httpResp.statusCode) else {
-                throw URLError(.badServerResponse, userInfo: ["badCode": httpResp.statusCode])
+            guard validCodes.contains(httpResp.statusCode) else {
+                throw URLError(.badServerResponse, userInfo: ["statusCode": httpResp.statusCode])
             }
             return data
         }
     }
+}
+
+extension Result where Success: Encodable {
+    @inlinable
+    func encodeJSON(_ encoder: JSONEncoder) -> Result<Data, Error> {
+        tryMap { try encoder.encode($0) }
+    }
+}
+
+extension URLSession {
+    typealias Response = Result<Data, Error>
+    typealias RequestBuilder = AsyncReader<Request, Response>
     
-    func resultFrom(
-        _ method: Request.Method,
-        endpoint: Endpoint
-    ) async -> Result<Data, Error> {
-        await endpoint.url()
-            .map(Request.new.method(method).apply(_:))
-            .asyncFlatMap(self.result(for:))
-            .flatMap(parseResponse)
+    func request(_ endpoint: Endpoint) -> RequestBuilder {
+        RequestBuilder { request in
+            await endpoint.url()
+                .map(request.apply(_:))
+                .asyncFlatMap(self.result(for:))
+                .validateStatus(200...299)
+        }
     }
     
     func imageFrom(_ url: URL) async -> Result<Data, Error> {
         await self.result(from: url)
-            .flatMap(parseResponse)
+            .validateStatus(200...299)
     }
 }

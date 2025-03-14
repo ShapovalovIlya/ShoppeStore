@@ -22,6 +22,7 @@ public extension Persistence {
         case card
         case searchHistory
         case userToken
+        case savedUsers
     }
     
     //MARK: - Properties
@@ -92,6 +93,34 @@ public extension Persistence {
         get { userDefaults.string(forKey: Persistence.Key.userToken.rawValue) }
         set { userDefaults.setValue(newValue.filter(!\.isEmpty), forKey: .userToken) }
     }
+    
+    /// Загрузить авторизированных пользователей.
+    ///
+    /// Если сохраненных пользователей нет, запрос вернет ошибку.
+    ///
+    /// - Returns: Массив авторизированных пользователей или ошибка, возникшая в процессе.
+    func loadUsers() -> Result<[ShoppeUser], Error> {
+        Result {
+            guard let saved = userDefaults.dataForKey(.savedUsers) else {
+                throw CocoaError(.fileNoSuchFile)
+            }
+            return saved
+        }
+        .decodeJSON([ShoppeUser].self, decoder: JSONDecoder())
+    }
+
+    /// Сохранить авторизированных пользователей.
+    /// - Parameter users: массив пользователей, которых нужно сохранить.
+    /// - Returns: Если пользователя были сохранены успешно, результат будет содержать исходную коллекцию.
+    ///            Если, по какой-либо причине сохранение не удалось, вернется соответствующая ошибка.
+    @discardableResult
+    func saveUsers(_ users: [ShoppeUser]) -> Result<[ShoppeUser], Error> {
+        Result<[ShoppeUser], Error>
+            .success(users)
+            .encodeJSON(JSONEncoder())
+            .map { userDefaults.setValue($0, forKey: .savedUsers) }
+            .map { users }
+    }
 }
 
 extension UserDefaults: @unchecked @retroactive Sendable {
@@ -118,5 +147,10 @@ extension UserDefaults: @unchecked @retroactive Sendable {
     @inlinable
     func stringArrayForKey(_ key: Persistence.Key) -> [String]? {
         self.stringArray(forKey: key.rawValue)
+    }
+    
+    @inlinable
+    func dataForKey(_ key: Persistence.Key) -> Data? {
+        self.data(forKey: key.rawValue)
     }
 }

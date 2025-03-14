@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct Credentials: Hashable, Encodable {
+public struct Credentials: Hashable, Encodable, Sendable {
     public let username: String
     public let password: String
     

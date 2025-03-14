@@ -29,7 +29,7 @@ import Foundation
    "women's clothing"
  */
 
-public struct Product: Decodable, Hashable, Identifiable {
+public struct Product: Decodable, Hashable, Identifiable, Sendable {
     public let id: Int
     public let title: String
     public let price: Double
@@ -89,14 +89,14 @@ public struct Product: Decodable, Hashable, Identifiable {
 }
 
 public extension Product {
-    enum Category: String, CaseIterable, Decodable {
+    enum Category: String, CaseIterable, Decodable, Sendable {
         case electronics
         case jewelery
         case mensClothing = "men's clothing"
         case womensClothing = "women's clothing"
     }
     
-    struct Rating: Decodable, Hashable {
+    struct Rating: Decodable, Hashable, Sendable {
         public let rate: Double
         public let count: Int
         

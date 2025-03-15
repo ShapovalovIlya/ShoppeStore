@@ -23,6 +23,7 @@ public extension Persistence {
         case searchHistory
         case userToken
         case savedUsers
+        case currentUsers
     }
     
     //MARK: - Properties
@@ -120,6 +121,19 @@ public extension Persistence {
             .encodeJSON(JSONEncoder())
             .map { userDefaults.setValue($0, forKey: .savedUsers) }
             .map { users }
+    }
+    
+    /// Текущий, авторизированный пользователь.
+    var currentUser: ShoppeUser? {
+        get {
+            userDefaults
+                .dataForKey(.currentUsers)
+                .flatMap { try? JSONDecoder().decode(ShoppeUser.self, from: $0) }
+        }
+        set {
+            let encoded = newValue.flatMap { try? JSONEncoder().encode($0) }
+            userDefaults.setValue(encoded, forKey: .currentUsers)
+        }
     }
 }
 

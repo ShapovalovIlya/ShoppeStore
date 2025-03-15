@@ -89,14 +89,14 @@ public struct Product: Codable, Hashable, Identifiable, Sendable {
 }
 
 public extension Product {
-    enum Category: String, CaseIterable, Decodable, Sendable {
+    enum Category: String, CaseIterable, Codable, Sendable {
         case electronics
         case jewelery
         case mensClothing = "men's clothing"
         case womensClothing = "women's clothing"
     }
     
-    struct Rating: Decodable, Hashable, Sendable {
+    struct Rating: Codable, Hashable, Sendable {
         public let rate: Double
         public let count: Int
         

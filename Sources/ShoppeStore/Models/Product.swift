@@ -29,7 +29,7 @@ import Foundation
    "women's clothing"
  */
 
-public struct Product: Decodable, Hashable, Identifiable, Sendable {
+public struct Product: Codable, Hashable, Identifiable, Sendable {
     public let id: Int
     public let title: String
     public let price: Double
